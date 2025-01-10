@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:latest
+    container_name: postgres-product-invoice-fastapi
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    expose:
+      - ${PG_PORT}
+    environment:
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+
+  fastapi:
+    build: ./
+    container_name: product-invoice-fastapi
+    depends_on:
+      - db
+    expose:
+      - 8000
+    env_file: .env
+    environment:
+      - PG_DB_URL=postgresql+asyncpg://${PG_USER}:${PG_PASSWORD}@db:${PG_PORT}
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-product-invoice-fastapi
+    restart: unless-stopped
+    depends_on:
+      - fastapi
+    ports:
+      - 80:80
+    volumes:
+      - ./app/configuration/nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+volumes:
+  pg_data:
