@@ -8,7 +8,8 @@ RUN mkdir ./certs && \
 
 COPY requirements.txt .
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
+ENV TZ="Europe/Kiev" \
+    PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 RUN python3 -m venv .venv
